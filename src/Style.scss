@@ -1,0 +1,74 @@
+$blue: #00bcd4;
+$lightblue: #b2ebf2;
+$orange: #ff5722;
+$red: #dd2c00;
+
+* {
+    margin: 0;
+    padding: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-family: "Epilogue", sans-serif;
+}
+
+.hero-container {
+    text-align: center;
+    padding: 4rem 0 4rem 0;
+    h1 {
+        font-size: 3.5rem;
+        padding-bottom: 1rem;
+    }
+    .search-input {
+        width: 50vw;
+        display: block;
+        margin: 1rem auto 1rem auto;
+        padding: 0.7rem;
+        font-size: 1.2rem;
+    }
+    .search-button {
+        padding: 0.8rem;
+        background-color: $blue;
+        color: white;
+        font-size: 1.2rem;
+        font-family: "Epilogue", sans-serif;
+        cursor: pointer;
+        border-radius: 5px;
+        border-color: $blue;
+    }
+    .curated-images-container {
+        padding-top: 4rem;
+        display: flex;
+        flex-wrap: wrap;
+        width: 95%;
+        margin: auto;
+        gap: 1rem;
+        place-content: center;
+
+        img {
+            transition: 0.4s all ease-in-out;
+            cursor: pointer;
+            flex: 1;
+        }
+    }
+}
+.image-container {
+    position: relative;
+
+    .photographer {
+        text-decoration: none;
+        color: white;
+        display: none;
+        position: absolute;
+        bottom: 0.3rem;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.425);
+    }
+}
+.image-container:hover .photographer {
+    display: block;
+}
