@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { API_KEY } from '../../Config'
+import { Colours } from './Data'
 function Landing() {
 
-    const [Curated, setCurated] = useState();
-    const [NextPage, setNextPage] = useState();
+    const [Background, setBackground] = useState();
+    const [Count, setCount] = useState(0);
+
+
 
     useEffect(() => {
-        fetch("https://api.pexels.com/v1/curated?per_page=20?page=1", {
+
+
+        fetch(`https://api.pexels.com/v1/search?query=nature&color=blue&per_page=20`, {
             headers: {
                 Authorization: `${API_KEY}`
             }
@@ -14,34 +19,25 @@ function Landing() {
             .then(res => res.json())
             .then(res => {
                 console.log(res)
-                setCurated(res.photos)
-                setNextPage(res.next_page)
+                setBackground(res)
             })
+
     }, []);
 
-
     return (
-
         <div>
-            <div className="hero-container">
-                <h1>Be Inspired.</h1>
-                <h3>Find Your Next Photo For Your Project</h3>
-                <input className="search-input" placeholder="Search For Free Images & Videos"></input>
-                <button className="search-button">Search</button>
-
-                <div className='curated-images-container'>
-                    {Curated ? Curated.map((el, index) => {
-                        return <div key={index} className="image-container">
-                            <img src={el.src.large} alt="curated" ></img>
-                            <a className='photographer' href={el.photographer_url}>{el.photographer}</a>
-                        </div>
-                    })
-                        : <span></span>}
+            {Background && Background.photos.length > 0 ? <div className="hero-container" style={{ backgroundImage: `url(${Background.photos[Count].src.original})` }}>
+                <div>
+                    <div className="colours-container">
+                        {Colours.map((el, index) => { return <div className="colours" style={{ backgroundColor: `${el.colour}` }} key={index}></div> })}
+                    </div>
+                    <div className="action-container">
+                        <p>Photographer: {Background.photos[Count].photographer} </p>
+                    </div>
                 </div>
+            </div> : <span></span>}
 
-            </div>
-
-        </div>
+        </div >
     )
 }
 
