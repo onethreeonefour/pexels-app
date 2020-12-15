@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { API_KEY } from '../../Config'
 import { Colours } from './Data'
+import ProgressiveImage from "react-progressive-graceful-image";
+
 function Landing() {
 
     const [Background, setBackground] = useState();
     const [Count, setCount] = useState(0);
-
-
+    const [Query, setQuery] = useState("Nature");
+    const [ColoursChart, setColoursChart] = useState(Colours);
+    const [ColourSelection, setColorSelection] = useState(0);
 
     useEffect(() => {
-
-
-        fetch(`https://api.pexels.com/v1/search?query=nature&color=blue&per_page=20`, {
+        fetch(`https://api.pexels.com/v1/search?query=${Query}&color=${ColoursChart[ColourSelection].colour}&per_page=20`, {
             headers: {
                 Authorization: `${API_KEY}`
             }
@@ -22,16 +23,69 @@ function Landing() {
                 setBackground(res)
             })
 
-    }, []);
+    }, [ColourSelection]);
+
+    const nextImage = () => {
+        setCount(Count + 1)
+    }
+    const prevImage = () => {
+        setCount(Count - 1)
+    }
+
+    const colourSelect = (e) => {
+        setColorSelection(e.target.id)
+        setCount(0)
+    }
+
+    const onChangeSearch = (e) => {
+        setQuery(e.currentTarget.value)
+    }
+
+    const handleSubmit = (e) => {
+
+        e.preventDefault();
+        fetch(`https://api.pexels.com/v1/search?query=${Query}&color=${ColoursChart[ColourSelection].colour}&per_page=20`, {
+            headers: {
+                Authorization: `${API_KEY}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                console.log(res)
+                setBackground(res)
+            })
+    }
 
     return (
         <div>
-            {Background && Background.photos.length > 0 ? <div className="hero-container" style={{ backgroundImage: `url(${Background.photos[Count].src.original})` }}>
+            {Background && Background.photos.length > 0 ? <div className="hero-container" style={{ backgroundColor: `${ColoursChart[ColourSelection].colour}` }}>
                 <div>
+                    <div className="wallpaper-container">
+
+                        <ProgressiveImage src={Background.photos[Count].src.original} placeholder={Background.photos[Count].src.medium} >
+                            {(src, loading) => <img style={{ opacity: loading ? 0.8 : 1 }} src={src} className="wallpaper" alt="wallpaper" />}
+                        </ProgressiveImage>
+                    </div>
                     <div className="colours-container">
-                        {Colours.map((el, index) => { return <div className="colours" style={{ backgroundColor: `${el.colour}` }} key={index}></div> })}
+                        {ColoursChart.map((el, index) => {
+                            return <div className="colours" style={{ backgroundColor: `${el.colour}` }} key={index} id={index} onClick={colourSelect}>
+                            </div>
+                        })}
                     </div>
                     <div className="action-container">
+                        <h2>The Wall Engine</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" value={Query} onChange={onChangeSearch} />
+                        </form>
+                        <div className='action-buttons'>
+                            {Count <= 0 ? <button style={{ backgroundColor: 'black' }}>🡠</button> : <button onClick={prevImage}>🡠</button>}
+                            <button onClick={nextImage}>🡢</button>
+                        </div>
+                        <h2>
+                            <span className="pexels">Powered By Pexels</span>
+                        </h2>
+                    </div>
+                    <div className="photographer-container">
                         <p>Photographer: {Background.photos[Count].photographer} </p>
                     </div>
                 </div>
