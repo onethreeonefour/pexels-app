@@ -12,7 +12,7 @@ export const Colours = [
         colour: "Yellow"
     },
     {
-        colour: "Green"
+        colour: "Lightgreen"
     },
     {
         colour: "Turquoise"

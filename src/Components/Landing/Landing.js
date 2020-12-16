@@ -7,9 +7,10 @@ function Landing() {
 
     const [Background, setBackground] = useState();
     const [Count, setCount] = useState(0);
-    const [Query, setQuery] = useState("Nature");
+    const [Query, setQuery] = useState("Flowers");
     const [ColoursChart, setColoursChart] = useState(Colours);
     const [ColourSelection, setColorSelection] = useState(0);
+    const [NextPage, setNextPage] = useState();
 
     useEffect(() => {
         fetch(`https://api.pexels.com/v1/search?query=${Query}&color=${ColoursChart[ColourSelection].colour}&per_page=20`, {
@@ -20,13 +21,35 @@ function Landing() {
             .then(res => res.json())
             .then(res => {
                 console.log(res)
+                setNextPage(res.next_page)
                 setBackground(res)
             })
 
     }, [ColourSelection]);
 
+    const getNextImages = () => {
+        fetch(NextPage, {
+            headers: {
+                Authorization: `${API_KEY}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+
+                setNextPage(res.next_page)
+                setBackground(res);
+            })
+    }
+
     const nextImage = () => {
-        setCount(Count + 1)
+        if (Count >= 18) {
+            setCount(0)
+            getNextImages()
+        }
+        else {
+            setCount(Count + 1)
+        }
+
     }
     const prevImage = () => {
         setCount(Count - 1)
@@ -42,7 +65,7 @@ function Landing() {
     }
 
     const handleSubmit = (e) => {
-
+        setCount(0)
         e.preventDefault();
         fetch(`https://api.pexels.com/v1/search?query=${Query}&color=${ColoursChart[ColourSelection].colour}&per_page=20`, {
             headers: {
@@ -51,8 +74,15 @@ function Landing() {
         })
             .then(res => res.json())
             .then(res => {
-                console.log(res)
-                setBackground(res)
+                //console.log(res)
+                if (res.total_results <= 0) {
+
+                    setQuery("No Results Found")
+                }
+                else {
+                    setBackground(res)
+                }
+
             })
     }
 
@@ -61,10 +91,16 @@ function Landing() {
             {Background && Background.photos.length > 0 ? <div className="hero-container" style={{ backgroundColor: `${ColoursChart[ColourSelection].colour}` }}>
                 <div>
                     <div className="wallpaper-container">
+                        {Background.photos[Count].width > Background.photos[Count].height ?
+                            <ProgressiveImage src={Background.photos[Count].src.original} placeholder={Background.photos[Count].src.landscape} >
+                                {(src, loading) => <img style={{ opacity: loading ? 0.3 : 1 }} src={src} className="landscape" alt="wallpaper" />}
+                            </ProgressiveImage>
+                            :
+                            <ProgressiveImage src={Background.photos[Count].src.original} placeholder={Background.photos[Count].src.large} >
+                                {(src, loading) => <img style={{ opacity: loading ? 0.3 : 1 }} src={src} className="portrait" alt="wallpaper" />}
+                            </ProgressiveImage>
+                        }
 
-                        <ProgressiveImage src={Background.photos[Count].src.original} placeholder={Background.photos[Count].src.medium} >
-                            {(src, loading) => <img style={{ opacity: loading ? 0.8 : 1 }} src={src} className="wallpaper" alt="wallpaper" />}
-                        </ProgressiveImage>
                     </div>
                     <div className="colours-container">
                         {ColoursChart.map((el, index) => {
@@ -75,7 +111,7 @@ function Landing() {
                     <div className="action-container">
                         <h2>The Wall Engine</h2>
                         <form onSubmit={handleSubmit}>
-                            <input type="text" value={Query} onChange={onChangeSearch} />
+                            <input type="text" value={Query} onChange={onChangeSearch} required />
                         </form>
                         <div className='action-buttons'>
                             {Count <= 0 ? <button style={{ backgroundColor: 'black' }}>🡠</button> : <button onClick={prevImage}>🡠</button>}
