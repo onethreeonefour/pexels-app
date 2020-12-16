@@ -20,7 +20,6 @@ function Landing() {
         })
             .then(res => res.json())
             .then(res => {
-                console.log(res)
                 setNextPage(res.next_page)
                 setBackground(res)
             })
