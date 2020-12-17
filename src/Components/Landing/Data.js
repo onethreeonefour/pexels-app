@@ -1,6 +1,6 @@
 export const Colours = [
     {
-        colour: "Blue"
+        colour: "#4d9efa"
     },
     {
         colour: "Red"
@@ -19,7 +19,7 @@ export const Colours = [
     },
 
     {
-        colour: "Violet"
+        colour: "#df3aee"
     },
     {
         colour: "Pink"
